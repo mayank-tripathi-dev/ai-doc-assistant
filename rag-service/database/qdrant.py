@@ -2,7 +2,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 
 # In-memory Qdrant database
-client = QdrantClient(":memory:")
+client = QdrantClient(path="./qdrant_db")
 
 COLLECTION_NAME = "documents"
 
@@ -23,7 +23,7 @@ def create_collection():
         print("Collection already exists.")
 
 
-def store_embeddings(chunks, embeddings):
+def store_embeddings(chunks, embeddings, filename):
     points = []
 
     for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
@@ -57,4 +57,4 @@ def search_similar_chunks(query_embedding, limit=5):
             "text": point.payload["text"],
         }
         for point in response.points
-    ]
+    ] 
