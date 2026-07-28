@@ -22,11 +22,12 @@ def create_collection():
     else:
         print("Collection already exists.")
 
-
-def store_embeddings(chunks, embeddings, filename):
+def store_embeddings(chunks, embeddings, filename, metadata):
     points = []
 
-    for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
+    for i, (chunk, embedding, meta) in enumerate(
+    zip(chunks, embeddings, metadata)
+):
         points.append(
             PointStruct(
                 id=i,
@@ -34,6 +35,7 @@ def store_embeddings(chunks, embeddings, filename):
                  payload={
                     "text": chunk,
                     "filename": filename,
+                    "page": meta["page"],
                     "chunk_id": i
                 }
             )
@@ -58,6 +60,7 @@ def search_similar_chunks(query_embedding, limit=5):
             "score": point.score,
             "text": point.payload["text"],
             "filename": point.payload["filename"],
+            "page": point.payload["page"],
             "chunk_id": point.payload["chunk_id"],
         }
         for point in response.points

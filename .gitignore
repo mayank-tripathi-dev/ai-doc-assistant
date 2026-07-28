@@ -25,3 +25,14 @@ node_modules/
 # OS
 .DS_Store
 Thumbs.db
+
+
+# Qdrant
+rag-service/qdrant_db/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Uploads
+rag-service/uploads/

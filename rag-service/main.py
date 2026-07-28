@@ -41,24 +41,38 @@ async def upload_pdf(file: UploadFile = File(...)):
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    text = extract_text(file_path)
+    # Extract page-wise text
+    pages = extract_text(file_path)
 
-    chunks = chunk_text(text)
+    all_chunks = []
+    all_metadata = []
 
-    embeddings = generate_embeddings(chunks)
+    for page in pages:
+        chunks = chunk_text(page["text"])
+
+        for chunk in chunks:
+            all_chunks.append(chunk)
+            all_metadata.append(
+                {
+                    "page": page["page"]
+                }
+            )
+
+    embeddings = generate_embeddings(all_chunks)
 
     store_embeddings(
-    chunks,
-    embeddings,
-    file.filename
-)
+        all_chunks,
+        embeddings,
+        file.filename,
+        all_metadata
+    )
 
     return {
-    "filename": file.filename,
-    "characters": len(text),
-    "chunks": len(chunks),
-    "first_chunk": chunks[0]
-}
+        "filename": file.filename,
+        "pages": len(pages),
+        "chunks": len(all_chunks),
+        "first_chunk": all_chunks[0] if all_chunks else ""
+    }
 
 
 @app.post("/search")
