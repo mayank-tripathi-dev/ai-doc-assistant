@@ -1,5 +1,12 @@
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
+from qdrant_client.models import (
+    Distance,
+    VectorParams,
+    PointStruct,
+    Filter,
+    FieldCondition,
+    MatchValue,
+)
 
 # In-memory Qdrant database
 client = QdrantClient(path="./qdrant_db")
@@ -65,3 +72,42 @@ def search_similar_chunks(query_embedding, limit=5):
         }
         for point in response.points
     ] 
+
+
+def get_documents():
+    response = client.scroll(
+        collection_name=COLLECTION_NAME,
+        limit=1000,
+        with_payload=True,
+        with_vectors=False,
+    )
+
+    points = response[0]
+
+    filenames = sorted(
+        list(
+            {
+                point.payload["filename"]
+                for point in points
+                if "filename" in point.payload
+            }
+        )
+    )
+
+    return filenames
+
+def delete_document(filename: str):
+
+    client.delete(
+        collection_name=COLLECTION_NAME,
+        points_selector=Filter(
+            must=[
+                FieldCondition(
+                    key="filename",
+                    match=MatchValue(value=filename)
+                )
+            ]
+        )
+    )
+
+    print(f"{filename} deleted successfully.")

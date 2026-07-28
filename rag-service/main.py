@@ -7,6 +7,8 @@ from database.qdrant import (
     create_collection,
     store_embeddings,
     search_similar_chunks,
+    get_documents,
+    delete_document,
 )
 
 from pydantic import BaseModel
@@ -26,6 +28,24 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 def home():
     return {
         "message": "AI Document Assistant API "
+    }
+
+@app.get("/documents")
+async def documents():
+
+    docs = get_documents()
+
+    return {
+        "documents": docs
+    }
+
+@app.delete("/documents/{filename}")
+async def remove_document(filename: str):
+
+    delete_document(filename)
+
+    return {
+        "message": f"{filename} deleted successfully."
     }
 
 @app.on_event("startup")
