@@ -31,8 +31,10 @@ def store_embeddings(chunks, embeddings, filename):
             PointStruct(
                 id=i,
                 vector=embedding.tolist(),
-                payload={
-                    "text": chunk
+                 payload={
+                    "text": chunk,
+                    "filename": filename,
+                    "chunk_id": i
                 }
             )
         )
@@ -55,6 +57,8 @@ def search_similar_chunks(query_embedding, limit=5):
         {
             "score": point.score,
             "text": point.payload["text"],
+            "filename": point.payload["filename"],
+            "chunk_id": point.payload["chunk_id"],
         }
         for point in response.points
     ] 

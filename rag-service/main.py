@@ -47,7 +47,11 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     embeddings = generate_embeddings(chunks)
 
-    store_embeddings(chunks, embeddings)
+    store_embeddings(
+    chunks,
+    embeddings,
+    file.filename
+)
 
     return {
     "filename": file.filename,
