@@ -1,10 +1,21 @@
 from fastapi import FastAPI, UploadFile, File
 from services.pdf_service import extract_text
 from utils.chunker import chunk_text
+from services.embedding_service import generate_embeddings
+from database.qdrant import (
+    create_collection,
+    store_embeddings,
+    search_similar_chunks,
+)
+
+from pydantic import BaseModel
 import shutil
 import os
 
 app = FastAPI()
+
+class SearchRequest(BaseModel):
+    query: str
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -13,8 +24,12 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 @app.get("/")
 def home():
     return {
-        "message": "AI Document Assistant API 🚀"
+        "message": "AI Document Assistant API "
     }
+
+@app.on_event("startup")
+async def startup():
+    create_collection()
 
 
 @app.post("/upload")
@@ -29,9 +44,26 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     chunks = chunk_text(text)
 
+    embeddings = generate_embeddings(chunks)
+
+    store_embeddings(chunks, embeddings)
+
     return {
     "filename": file.filename,
     "characters": len(text),
     "chunks": len(chunks),
     "first_chunk": chunks[0]
 }
+
+
+@app.post("/search")
+async def search(request: SearchRequest):
+
+    query_embedding = generate_embeddings([request.query])[0]
+
+    results = search_similar_chunks(query_embedding)
+
+    return {
+        "query": request.query,
+        "results": results
+    }
