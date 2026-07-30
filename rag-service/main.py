@@ -121,3 +121,17 @@ async def search(request: SearchRequest):
         "answer": answer,
         "sources": results
     }
+
+@app.get("/documents")
+def documents():
+    return {
+        "documents": get_documents()
+    }
+
+@app.delete("/documents/{filename}")
+def delete_file(filename: str):
+    delete_document(filename)
+
+    return {
+        "message": f"{filename} deleted successfully"
+    }

@@ -127,3 +127,4 @@ def delete_document(filename: str):
     )
 
     print(f"{filename} deleted successfully.")
+
