@@ -55,10 +55,27 @@ def store_embeddings(chunks, embeddings, filename, metadata):
 
     print(f"Stored {len(points)} chunks in Qdrant.")
 
-def search_similar_chunks(query_embedding, limit=5):
+def search_similar_chunks(
+    query_embedding,
+    filename=None,
+    limit=5,
+):
+    search_filter = None
+
+    if filename:
+        search_filter = Filter(
+            must=[
+                FieldCondition(
+                    key="filename",
+                    match=MatchValue(value=filename)
+                )
+            ]
+        )
+
     response = client.query_points(
         collection_name=COLLECTION_NAME,
         query=query_embedding.tolist(),
+        query_filter=search_filter,
         limit=limit,
     )
 
@@ -71,8 +88,7 @@ def search_similar_chunks(query_embedding, limit=5):
             "chunk_id": point.payload["chunk_id"],
         }
         for point in response.points
-    ] 
-
+    ]
 
 def get_documents():
     response = client.scroll(

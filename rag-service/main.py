@@ -12,13 +12,16 @@ from database.qdrant import (
 )
 
 from pydantic import BaseModel
+from typing import Optional
 import shutil
 import os
 
 app = FastAPI()
 
+
 class SearchRequest(BaseModel):
     query: str
+    filename: Optional[str] = None
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -102,7 +105,10 @@ async def search(request: SearchRequest):
     query_embedding = generate_embeddings([request.query])[0]
 
     # Retrieve relevant chunks
-    results = search_similar_chunks(query_embedding)
+    results = search_similar_chunks(
+    query_embedding,
+    filename=request.filename
+)
 
     # Combine retrieved chunks into one context
     context = "\n\n".join([item["text"] for item in results])
