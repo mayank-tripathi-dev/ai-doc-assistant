@@ -1,0 +1,404 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI Doc Assistant | Document Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#131b2e",
+                        "outline": "#475569",
+                        "outline-variant": "#1e293b",
+                        "tertiary-container": "#334155",
+                        "primary-fixed": "#e1e0ff",
+                        "inverse-primary": "#c0c1ff",
+                        "surface-container-lowest": "#0b1120",
+                        "background": "#0F172A",
+                        "on-secondary-container": "#94a3b8",
+                        "tertiary": "#94a3b8",
+                        "inverse-on-surface": "#f8f9ff",
+                        "primary-container": "#6366F1",
+                        "inverse-surface": "#f8f9ff",
+                        "on-tertiary-container": "#f1f5f9",
+                        "surface-container-highest": "#1e293b",
+                        "secondary": "#94a3b8",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "surface": "#0F172A",
+                        "on-secondary-fixed-variant": "#1e293b",
+                        "tertiary-fixed": "#e0e3e5",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-tertiary-fixed-variant": "#cbd5e1",
+                        "on-tertiary-fixed": "#f1f5f9",
+                        "surface-dim": "#0b1120",
+                        "error": "#ef4444",
+                        "on-secondary": "#ffffff",
+                        "primary": "#6366F1",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#f8f9ff",
+                        "surface-bright": "#1e293b",
+                        "error-container": "#450a0a",
+                        "surface-container": "#1e293b",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#07006c",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "on-surface-variant": "#94a3b8",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#f8f9ff",
+                        "surface-container-low": "#0b1120",
+                        "surface-container-high": "#1e293b",
+                        "on-primary-container": "#ffffff",
+                        "surface-variant": "#1e293b",
+                        "secondary-fixed": "#dae2fd",
+                        "on-error-container": "#fca5a5",
+                        "surface-tint": "#6366F1",
+                        "secondary-container": "#1e293b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "element-gap": "8px",
+                        "panel-gap": "1px",
+                        "container-padding": "16px",
+                        "unit": "4px",
+                        "sidebar-width": "280px"
+                    },
+                    "fontFamily": {
+                        "label-mono": ["JetBrains Mono"],
+                        "label-caps": ["Inter"],
+                        "h2": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "h1": ["Inter"],
+                        "body-base": ["Inter"],
+                        "display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-mono": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "h2": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-base": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display": ["30px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-[#0b1120] h-screen w-sidebar-width fixed left-0 top-0 border-r border-outline-variant flex flex-col py-container-padding px-4 z-50">
+<div class="mb-8">
+<h1 class="font-h1 text-h1 text-white tracking-tight">AI Doc Assistant</h1>
+<p class="font-label-caps text-label-caps text-slate-400 mt-1">Qdrant Connected</p>
+</div>
+<nav class="flex-grow space-y-1">
+<a class="flex items-center px-3 py-2 text-primary bg-[#1e293b] rounded-lg font-bold transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">folder</span>
+<span class="font-label-caps text-label-caps">Documents</span>
+</a>
+<a class="flex items-center px-3 py-2 text-slate-400 hover:text-white hover:bg-[#1e293b] rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">database</span>
+<span class="font-label-caps text-label-caps">Collections</span>
+</a>
+<a class="flex items-center px-3 py-2 text-slate-400 hover:text-white hover:bg-[#1e293b] rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">grid_view</span>
+<span class="font-label-caps text-label-caps">Workspaces</span>
+</a>
+<a class="flex items-center px-3 py-2 text-slate-400 hover:text-white hover:bg-[#1e293b] rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant">
+<button class="w-full bg-primary text-white font-label-caps text-label-caps py-3 mb-6 rounded-lg hover:opacity-90 active:scale-95 transition-all">
+                Upload PDF
+            </button>
+<div class="space-y-1">
+<a class="flex items-center px-3 py-2 text-slate-400 hover:text-white hover:bg-[#1e293b] rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">help</span>
+<span class="font-label-caps text-label-caps">Help</span>
+</a>
+<a class="flex items-center px-3 py-2 text-slate-400 hover:text-white hover:bg-[#1e293b] rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-3">logout</span>
+<span class="font-label-caps text-label-caps">Logout</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar-width flex-grow flex flex-col h-screen overflow-y-auto">
+<!-- TopNavBar -->
+<header class="bg-background text-primary border-b border-outline-variant sticky top-0 z-40 flex justify-between items-center h-12 px-container-padding">
+<div class="flex items-center gap-6">
+<span class="font-h2 text-h2 text-white font-black">AI Doc Assistant</span>
+<nav class="hidden md:flex gap-4">
+<a class="font-label-caps text-label-caps text-slate-400 hover:text-primary transition-all" href="#">Workspace</a>
+<a class="font-label-caps text-label-caps text-primary border-b-2 border-primary pb-1" href="#">Document Hub</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<input class="bg-[#1e293b] border-none rounded-full px-4 py-1 text-body-sm w-64 focus:ring-1 focus:ring-primary text-white placeholder-slate-500" placeholder="Search vectors..." type="text">
+<span class="material-symbols-outlined absolute right-3 top-1.5 text-slate-500 text-[18px]">search</span>
+</div>
+<button class="text-slate-400 hover:text-white transition-all p-1.5 flex items-center justify-center" title="Toggle Theme">
+    <span class="material-symbols-outlined">light_mode</span>
+</button><button class="bg-primary text-white font-label-caps text-label-caps px-4 py-1.5 rounded-full hover:opacity-90">New Session</button>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-white">notifications</span>
+<div class="w-8 h-8 rounded-full bg-[#1e293b] border border-outline-variant flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a tech executive in a minimalist studio setting, soft cinematic lighting, neutral color palette, sophisticated corporate modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_-j6HRLUlfzCY1rourOA-0nETj4zWvlsofeY3-u5UAziuVl45ZlTquhzAVADQ1DM2XVLlNgX08rmYfn_ehvHf-SHuMIcaWyYDm5aaT0ZGODfQ8NwInRJPcrw8x_drWmKbE_gXWNbh0wQmemhOegrtv1I9yYNF-6hgLVbgmQz_F7cVdr6t3XqD3tTCyOOnxHlZFz24zU6gv4_fvoJUMMjNuuQ7lESLqAC5sOsazImTLeTvqpAtWEwvkA">
+</div>
+</div>
+</header>
+<!-- Main Dashboard View -->
+<div class="p-container-padding space-y-6">
+<!-- Metric Banner -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-panel-gap bg-outline-variant rounded-xl overflow-hidden border border-outline-variant shadow-lg">
+<div class="bg-[#1e293b] p-6 flex items-center justify-between">
+<div>
+<p class="font-label-caps text-label-caps text-slate-400 mb-1">Total Documents</p>
+<h3 class="font-display text-display text-primary">24</h3>
+</div>
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[28px]">description</span>
+</div>
+</div>
+<div class="bg-[#1e293b] p-6 flex items-center justify-between">
+<div>
+<p class="font-label-caps text-label-caps text-slate-400 mb-1">Indexed Chunks</p>
+<h3 class="font-display text-display text-primary">1,420</h3>
+</div>
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[28px]">account_tree</span>
+</div>
+</div>
+<div class="bg-[#1e293b] p-6 flex items-center justify-between">
+<div>
+<p class="font-label-caps text-label-caps text-slate-400 mb-1">Active Tools</p>
+<h3 class="font-display text-display text-primary">3</h3>
+</div>
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[28px]">smart_toy</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Document Management Table -->
+<div class="lg:col-span-2 bg-[#1e293b] rounded-xl border border-outline-variant overflow-hidden flex flex-col shadow-lg">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center bg-[#0b1120]">
+<h2 class="font-h2 text-h2 text-white">Document Repository</h2>
+<div class="flex gap-2">
+<button class="p-1.5 hover:bg-[#1e293b] rounded transition-colors"><span class="material-symbols-outlined text-slate-400">filter_list</span></button>
+<button class="p-1.5 hover:bg-[#1e293b] rounded transition-colors"><span class="material-symbols-outlined text-slate-400">sort</span></button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#0b1120] border-b border-outline-variant">
+<th class="px-4 py-3 font-label-caps text-label-caps text-slate-400">Filename</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-slate-400 text-center">Pages</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-slate-400 text-center">Chunks</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-slate-400">Upload Date</th>
+<th class="px-4 py-3 font-label-caps text-label-caps text-slate-400 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-[#0b1120]/50 transition-colors h-12">
+<td class="px-4 py-2 font-body-base text-slate-200 flex items-center gap-3">
+<span class="material-symbols-outlined text-error">picture_as_pdf</span>
+                                        legal_contract_v2.pdf
+                                    </td>
+<td class="px-4 py-2 text-center font-label-mono text-label-mono text-slate-500">12</td>
+<td class="px-4 py-2 text-center font-label-mono text-label-mono text-slate-500">84</td>
+<td class="px-4 py-2 font-body-sm text-slate-400">Oct 24, 2023</td>
+<td class="px-4 py-2 text-right">
+<div class="flex items-center justify-end gap-3">
+<button class="bg-[#F59E0B] text-white px-3 py-1 rounded-full font-label-caps text-[10px] uppercase tracking-wider hover:brightness-110">Summarize</button>
+<button class="text-slate-500 hover:text-error transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-[#0b1120]/50 transition-colors h-12">
+<td class="px-4 py-2 font-body-base text-slate-200 flex items-center gap-3">
+<span class="material-symbols-outlined text-error">picture_as_pdf</span>
+                                        product_specs.pdf
+                                    </td>
+<td class="px-4 py-2 text-center font-label-mono text-label-mono text-slate-500">45</td>
+<td class="px-4 py-2 text-center font-label-mono text-label-mono text-slate-500">312</td>
+<td class="px-4 py-2 font-body-sm text-slate-400">Oct 22, 2023</td>
+<td class="px-4 py-2 text-right">
+<div class="flex items-center justify-end gap-3">
+<button class="bg-[#F59E0B] text-white px-3 py-1 rounded-full font-label-caps text-[10px] uppercase tracking-wider hover:brightness-110">Summarize</button>
+<button class="text-slate-500 hover:text-error transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-[#0b1120]/50 transition-colors h-12">
+<td class="px-4 py-2 font-body-base text-slate-200 flex items-center gap-3">
+<span class="material-symbols-outlined text-error">picture_as_pdf</span>
+                                        market_analysis_q3.pdf
+                                    </td>
+<td class="px-4 py-2 text-center font-label-mono text-label-mono text-slate-500">8</td>
+<td class="px-4 py-2 text-center font-label-mono text-label-mono text-slate-500">56</td>
+<td class="px-4 py-2 font-body-sm text-slate-400">Oct 19, 2023</td>
+<td class="px-4 py-2 text-right">
+<div class="flex items-center justify-end gap-3">
+<button class="bg-[#F59E0B] text-white px-3 py-1 rounded-full font-label-caps text-[10px] uppercase tracking-wider hover:brightness-110">Summarize</button>
+<button class="text-slate-500 hover:text-error transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-[#0b1120]/50 transition-colors h-12">
+<td class="px-4 py-2 font-body-base text-slate-200 flex items-center gap-3">
+<span class="material-symbols-outlined text-error">picture_as_pdf</span>
+                                        employee_handbook.pdf
+                                    </td>
+<td class="px-4 py-2 text-center font-label-mono text-label-mono text-slate-500">128</td>
+<td class="px-4 py-2 text-center font-label-mono text-label-mono text-slate-500">960</td>
+<td class="px-4 py-2 font-body-sm text-slate-400">Oct 15, 2023</td>
+<td class="px-4 py-2 text-right">
+<div class="flex items-center justify-end gap-3">
+<button class="bg-[#F59E0B] text-white px-3 py-1 rounded-full font-label-caps text-[10px] uppercase tracking-wider hover:brightness-110">Summarize</button>
+<button class="text-slate-500 hover:text-error transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Column: Upload & Processing -->
+<div class="space-y-6">
+<!-- Dropzone -->
+<div class="bg-[#1e293b] rounded-xl border-2 border-dashed border-slate-700 p-8 flex flex-col items-center justify-center text-center group hover:border-primary transition-colors cursor-pointer shadow-lg">
+<div class="w-16 h-16 bg-[#0b1120] rounded-full flex items-center justify-center text-slate-500 group-hover:text-primary mb-4 transition-colors">
+<span class="material-symbols-outlined text-[32px]">upload_file</span>
+</div>
+<h4 class="font-h2 text-h2 text-white mb-2">Upload PDF</h4>
+<p class="font-body-sm text-slate-400 mb-4">Drag and drop files here or click to browse</p>
+<button class="bg-primary text-white font-label-caps text-label-caps px-6 py-2 rounded-lg hover:brightness-110">Select Files</button>
+</div>
+<!-- Processing Progress -->
+<div class="bg-[#0b1120] border border-outline-variant rounded-xl p-6 text-slate-200 shadow-xl opacity-0 transition-opacity duration-1000" id="processing-panel">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-label-caps text-label-caps text-primary">Processing: internal_audit.pdf</h4>
+<span class="material-symbols-outlined animate-spin text-primary">sync</span>
+</div>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between font-label-mono text-label-mono mb-2">
+<span class="">Page Extraction</span>
+<span id="step1-pcnt" class="">100%</span>
+</div>
+<div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary transition-all duration-500 w-full" id="step1-bar"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-mono text-label-mono mb-2">
+<span class="">Chunking</span>
+<span id="step2-pcnt" class="">100%</span>
+</div>
+<div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary transition-all duration-500 w-[45%]" id="step2-bar" style="width: 100%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-mono text-label-mono mb-2">
+<span class="">Vector Embedding</span>
+<span id="step3-pcnt" class="">Complete</span>
+</div>
+<div class="h-1 bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-green-500 transition-all duration-500 w-0" id="step3-bar" style="width: 100%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Information Card -->
+<div class="bg-[#1e293b] rounded-xl p-6 border border-outline-variant shadow-sm">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary">info</span>
+<div>
+<h5 class="font-label-caps text-label-caps text-white mb-2">Vector Storage Insights</h5>
+<p class="font-body-sm text-slate-400">All documents are processed using the text-embedding-ada-002 model and stored in our secure Qdrant instance. Chunks are optimized for RAG context retrieval at a size of 512 tokens with 10% overlap.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simulate upload/processing for demonstration
+        setTimeout(() => {
+            const panel = document.getElementById('processing-panel');
+            panel.classList.remove('hidden');
+            
+            let progress = 45;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 5);
+                if (progress >= 100) {
+                    progress = 100;
+                    document.getElementById('step2-pcnt').innerText = '100%';
+                    document.getElementById('step2-bar').style.width = '100%';
+                    
+                    // Start third step
+                    startEmbedding();
+                    clearInterval(interval);
+                } else {
+                    document.getElementById('step2-pcnt').innerText = progress + '%';
+                    document.getElementById('step2-bar').style.width = progress + '%';
+                }
+            }, 300);
+        }, 1500);
+
+        function startEmbedding() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 8);
+                if (progress >= 100) {
+                    progress = 100;
+                    document.getElementById('step3-pcnt').innerText = 'Complete';
+                    document.getElementById('step3-bar').style.width = '100%';
+                    document.getElementById('step3-bar').classList.replace('bg-primary', 'bg-green-500');
+                    clearInterval(interval);
+                    
+                    setTimeout(() => {
+                        document.getElementById('processing-panel').classList.add('opacity-0', 'transition-opacity', 'duration-1000');
+                    }, 2000);
+                } else {
+                    document.getElementById('step3-pcnt').innerText = progress + '%';
+                    document.getElementById('step3-bar').style.width = progress + '%';
+                }
+            }, 400);
+        }
+    </script>
+
+
+</body></html>

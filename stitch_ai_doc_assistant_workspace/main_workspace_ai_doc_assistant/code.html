@@ -1,0 +1,425 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI Doc Assistant | Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#131b2e",
+                        "outline": "#767586",
+                        "outline-variant": "#c7c4d7",
+                        "tertiary-container": "#727577",
+                        "primary-fixed": "#e1e0ff",
+                        "inverse-primary": "#c0c1ff",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9ff",
+                        "on-secondary-container": "#5c647a",
+                        "tertiary": "#595c5e",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-container": "#6063ee",
+                        "inverse-surface": "#213145",
+                        "on-tertiary-container": "#fbfdff",
+                        "surface-container-highest": "#d3e4fe",
+                        "secondary": "#565e74",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "surface": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "tertiary-fixed": "#e0e3e5",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "on-tertiary-fixed": "#191c1e",
+                        "surface-dim": "#cbdbf5",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "primary": "#4648d4",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "surface-bright": "#f8f9ff",
+                        "error-container": "#ffdad6",
+                        "surface-container": "#e5eeff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#07006c",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "on-surface-variant": "#464554",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-high": "#dce9ff",
+                        "on-primary-container": "#fffbff",
+                        "surface-variant": "#d3e4fe",
+                        "secondary-fixed": "#dae2fd",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#494bd6",
+                        "secondary-container": "#dae2fd"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "element-gap": "8px",
+                        "panel-gap": "1px",
+                        "container-padding": "16px",
+                        "unit": "4px",
+                        "sidebar-width": "280px"
+                    },
+                    "fontFamily": {
+                        "label-mono": ["JetBrains Mono"],
+                        "label-caps": ["Inter"],
+                        "h2": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "h1": ["Inter"],
+                        "body-base": ["Inter"],
+                        "display": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-mono": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "h2": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "h1": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-base": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display": ["30px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .document-canvas-overlay {
+            mix-blend-mode: multiply;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .glass-toolbar {
+            backdrop-filter: blur(8px);
+            background: rgba(248, 249, 255, 0.85);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-base overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="bg-inverse-surface dark:bg-inverse-surface h-screen w-sidebar-width fixed left-0 top-0 border-r border-outline-variant dark:border-outline flex flex-col py-container-padding px-4 z-50">
+<div class="mb-8">
+<h1 class="font-h1 text-h1 text-on-primary-container tracking-tight">AI Doc Assistant</h1>
+<p class="font-label-caps text-label-caps text-outline-variant mt-1 uppercase">Qdrant Connected</p>
+</div>
+<button class="bg-primary-container text-on-primary-container font-label-caps text-label-caps py-3 px-4 rounded flex items-center justify-center gap-2 mb-8 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined">upload_file</span>
+            Upload PDF
+        </button>
+<nav class="flex-1 space-y-1">
+<!-- Documents Tab Active -->
+<a class="text-primary-fixed font-bold border-l-2 border-primary-container bg-on-secondary-fixed-variant flex items-center gap-3 px-3 py-2 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">folder</span>
+<span class="font-label-caps text-label-caps uppercase">Documents</span>
+</a>
+<a class="text-outline-variant hover:text-on-tertiary-container hover:bg-on-secondary-fixed-variant flex items-center gap-3 px-3 py-2 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-label-caps text-label-caps uppercase">Collections</span>
+</a>
+<a class="text-outline-variant hover:text-on-tertiary-container hover:bg-on-secondary-fixed-variant flex items-center gap-3 px-3 py-2 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-caps text-label-caps uppercase">Workspaces</span>
+</a>
+<a class="text-outline-variant hover:text-on-tertiary-container hover:bg-on-secondary-fixed-variant flex items-center gap-3 px-3 py-2 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps uppercase">Settings</span>
+</a>
+</nav>
+<!-- Document List Section (Nested in Sidebar for context) -->
+<div class="mt-8 pt-8 border-t border-on-secondary-fixed-variant">
+<h3 class="font-label-caps text-label-caps text-outline-variant uppercase mb-4">Indexed Documents</h3>
+<div class="space-y-3">
+<div class="p-3 bg-on-secondary-fixed-variant rounded-sm border border-primary-container/30 cursor-pointer group">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary-fixed text-sm">description</span>
+<span class="text-primary-fixed font-label-mono text-[11px] truncate">financial_report_2023.pdf</span>
+</div>
+<div class="flex justify-between items-center text-[10px] text-outline-variant font-label-mono uppercase">
+<span class="">12 pages</span>
+<span class="">48 chunks</span>
+</div>
+</div>
+<div class="p-3 hover:bg-on-secondary-fixed-variant rounded-sm border border-transparent cursor-pointer group transition-all">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-outline-variant text-sm group-hover:text-primary-fixed">description</span>
+<span class="text-outline-variant font-label-mono text-[11px] truncate group-hover:text-primary-fixed">market_analysis.pdf</span>
+</div>
+<div class="flex justify-between items-center text-[10px] text-outline-variant font-label-mono uppercase">
+<span class="">8 pages</span>
+<span class="">32 chunks</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-on-secondary-fixed-variant space-y-1">
+<a class="text-outline-variant hover:text-on-tertiary-container flex items-center gap-3 px-3 py-2 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-caps text-label-caps uppercase">Help</span>
+</a>
+<a class="text-outline-variant hover:text-on-tertiary-container flex items-center gap-3 px-3 py-2 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-caps text-label-caps uppercase">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="bg-surface dark:bg-surface text-primary dark:text-primary-fixed-dim border-b border-outline-variant dark:border-outline fixed top-0 left-0 right-0 h-12 flex justify-between items-center px-container-padding ml-sidebar-width z-40">
+<div class="flex items-center gap-8">
+<span class="font-h2 text-h2 text-on-surface font-black">AI Doc Assistant</span>
+<nav class="hidden md:flex gap-6">
+<a class="font-label-caps text-label-caps text-primary border-b-2 border-primary pb-1 uppercase" href="#">Workspace</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-all uppercase" href="#">Document Hub</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<input class="bg-surface-container-low border border-outline-variant px-4 py-1.5 rounded-full text-body-sm w-64 focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Search across docs..." type="text">
+<span class="material-symbols-outlined absolute right-3 top-1.5 text-on-surface-variant text-sm">search</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-all flex items-center justify-center" title="Toggle Theme">
+    <span class="material-symbols-outlined">dark_mode</span>
+</button><button class="bg-primary text-on-primary font-label-caps text-label-caps px-4 py-1.5 rounded hover:opacity-90 active:scale-95 uppercase">New Session</button>
+<div class="flex items-center gap-2 border-l border-outline-variant pl-4">
+<button class="text-on-surface-variant hover:text-primary transition-all"><span class="material-symbols-outlined">notifications</span></button>
+<div class="w-8 h-8 bg-surface-container-highest rounded-full flex items-center justify-center border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a middle-aged tech executive with short dark hair, wearing a navy blue blazer over a light blue shirt. The background is a soft, blurred corporate office setting with warm ambient lighting and sleek architectural lines. High resolution, professional photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBOzNYlta8tMzChKNacOlGDcOosqGpaz1_p4joDQJTaM30xLiHfpeOOF76Es9QXEMTkAYu6mw1-VGX_M3mLS-o1ARjFZEKauN4oirl5hiFOvEpuSKsTs8nZBKH7Wgu0KO_RJG_fDd-V113JIO36Vzo1KY7gp5DRybjcJsi3fMPRUFgJF_ZYATQNU2cn2de0-cAmxfEFZbL2M3DKlSrmJ59yMzcVR0SQL3eEh9faHp3tzchRHDT1pFuiQ">
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width mt-12 h-[calc(100vh-48px)] flex">
+<!-- Center: PDF Viewer Pane -->
+<section class="flex-1 bg-surface-container-low border-r border-outline-variant flex flex-col relative overflow-hidden">
+<!-- PDF Toolbar -->
+<div class="glass-toolbar h-12 border-b border-outline-variant flex items-center justify-between px-6 sticky top-0 z-30">
+<div class="flex items-center gap-4">
+<span class="font-label-mono text-label-mono text-on-surface-variant uppercase">financial_report_2023.pdf</span>
+<div class="h-4 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-2 bg-surface-container-lowest px-2 py-1 rounded border border-outline-variant">
+<button class="material-symbols-outlined text-sm hover:text-primary">chevron_left</button>
+<span class="font-label-mono text-[12px] min-w-[70px] text-center">Page 3 / 12</span>
+<button class="material-symbols-outlined text-sm hover:text-primary">chevron_right</button>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<button class="material-symbols-outlined text-lg text-on-surface-variant hover:text-primary">zoom_out</button>
+<span class="font-label-mono text-[12px]">100%</span>
+<button class="material-symbols-outlined text-lg text-on-surface-variant hover:text-primary">zoom_in</button>
+</div>
+<div class="h-4 w-px bg-outline-variant"></div>
+<label class="flex items-center gap-2 cursor-pointer group">
+<span class="font-label-caps text-label-caps text-on-surface-variant group-hover:text-primary uppercase">Highlight Chunks</span>
+<div class="w-8 h-4 bg-primary rounded-full relative">
+<div class="absolute right-1 top-1 w-2 h-2 bg-white rounded-full"></div>
+</div>
+</label>
+</div>
+</div>
+<!-- PDF Canvas -->
+<div class="flex-1 overflow-y-auto p-8 flex justify-center scroll-smooth">
+<div class="bg-white w-[800px] shadow-sm border border-outline-variant relative min-h-[1100px] p-16">
+<div class="absolute top-8 right-8 font-label-mono text-[10px] text-outline">CONFIDENTIAL - 2023 Q4</div>
+<!-- Faux Text Content -->
+<div class="space-y-6">
+<h2 class="font-h2 text-2xl text-on-surface font-bold border-b border-outline-variant pb-4">3. Operating Performance &amp; Strategic Initiatives</h2>
+<p class="text-body-base text-on-surface-variant leading-relaxed">
+                            During the fiscal year ended December 31, 2023, the Company demonstrated significant resilience in its core business operations. Revenue growth was primarily driven by the expansion of the digital services segment, which accounted for 42% of total consolidated earnings.
+                        </p>
+<!-- Highlighted Region -->
+<div class="relative group">
+<div class="absolute -inset-1 bg-primary/10 rounded-sm"></div>
+<div class="absolute left-[-20px] top-0 bottom-0 w-1 bg-primary rounded-full opacity-50"></div>
+<p class="text-body-base text-on-surface leading-relaxed font-medium">
+<span class="bg-primary/20 px-0.5 rounded-sm">The net profit margin improved by 450 basis points</span> compared to the previous year, reaching an all-time high of 18.2%. This optimization was attributed to the successful implementation of AI-assisted operational workflows across all logistics divisions.
+                            </p>
+<div class="absolute -right-4 top-0 translate-x-full bg-primary text-on-primary text-[10px] px-2 py-0.5 rounded font-label-mono opacity-0 group-hover:opacity-100 transition-opacity">
+                                CHUNK_ID: A82-F1
+                            </div>
+</div>
+<p class="text-body-base text-on-surface-variant leading-relaxed">
+                            Market volatility remained a headwind; however, the early adoption of adaptive risk management frameworks provided a buffer against inflationary pressures. Looking forward to 2024, the board has approved an additional capital expenditure of $24M specifically for document-level AI infrastructure.
+                        </p>
+<!-- Faux Chart Image -->
+<div class="my-10 border border-outline-variant rounded p-4 bg-surface-container-low">
+<div class="h-48 w-full bg-white relative overflow-hidden flex items-end gap-2 px-8">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20" data-alt="A highly detailed 2D professional financial chart showing a bar graph with upward trending blue bars and a secondary green line graph representing profit margins. The aesthetic is clean, minimalist, and corporate, using a palette of indigo, emerald green, and light gray. The background is a subtle grid texture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAorJpAEgfVVRCmdDUyTvx4hVAEs0WYOiX3R0iQ6ONogxqPHNsmO6t8RZaveDfL6qsvCxbZkSnqzUY95tsC4T4CMiXVyrMt_CChaWqU_F0fGrRhph-1WgocFiWwbafNor_JYcqaSpzuBv5njj23NOTCrmJSRpQ4KMLJ_0XGQf2jCD_oF_n156HgyGe-E3plTupJWDnebbF2rFPTLZRYMtQ26iK2CKXZgwhwZ2lo-5IE655BpJD9fqtvUA">
+<div class="w-full bg-primary/40 h-1/4 rounded-t-sm"></div>
+<div class="w-full bg-primary/40 h-2/4 rounded-t-sm"></div>
+<div class="w-full bg-primary/40 h-3/4 rounded-t-sm"></div>
+<div class="w-full bg-primary/60 h-4/4 rounded-t-sm"></div>
+<div class="w-full bg-primary/40 h-3/5 rounded-t-sm"></div>
+</div>
+<div class="text-center mt-2 font-label-mono text-[10px] text-outline uppercase">Fig 3.1: Quarterly Growth Trajectory (Normalized)</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right: AI Chat & Tool Execution Panel -->
+<section class="w-[440px] flex flex-col bg-surface overflow-hidden">
+<!-- Agent Activity Feed -->
+<div class="p-4 border-b border-outline-variant bg-surface-container-lowest">
+<div class="flex items-center justify-between mb-3">
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase">Agent Activity</h3>
+<span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+</div>
+<div class="flex flex-wrap gap-2">
+<div class="flex items-center gap-1.5 bg-primary/10 border border-primary/20 text-primary-container font-label-mono text-[11px] px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">find_in_page</span>
+                        retrieve_documents
+                    </div>
+<div class="flex items-center gap-1.5 bg-green-100 border border-green-200 text-green-700 font-label-mono text-[11px] px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">language</span>
+                        web_search (Tavily)
+                    </div>
+<div class="flex items-center gap-1.5 bg-on-tertiary-fixed-variant/10 border border-outline-variant text-on-surface-variant font-label-mono text-[11px] px-2 py-1 rounded opacity-50">
+<span class="material-symbols-outlined text-[14px]">calculate</span>
+                        analyze_spreadsheets
+                    </div>
+</div>
+</div>
+<!-- Chat Content -->
+<div class="flex-1 overflow-y-auto p-4 space-y-6">
+<!-- User Message -->
+<div class="flex flex-col items-end">
+<div class="bg-surface-container-high text-on-surface rounded-xl rounded-tr-none px-4 py-3 max-w-[90%] text-body-sm shadow-sm">
+                        What was the net profit margin for 2023 and what drove that improvement?
+                    </div>
+<span class="text-[10px] text-outline mt-1 px-1 font-label-mono">14:02 • User</span>
+</div>
+<!-- AI Response -->
+<div class="flex flex-col items-start">
+<div class="space-y-4 text-body-sm text-on-surface leading-relaxed max-w-[95%]">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-xs">smart_toy</span>
+</div>
+<span class="font-label-caps text-[10px] text-primary uppercase font-bold">Assistant</span>
+</div>
+<p class="">
+                            The net profit margin for 2023 was <strong class="text-primary">18.2%</strong>, representing a significant improvement of 450 basis points over the previous fiscal year.
+                        </p>
+<p class="">
+                            According to the financial report, this improvement was primarily driven by:
+                        </p>
+<ul class="list-disc pl-5 space-y-2 text-on-surface-variant">
+<li class="">
+                                The expansion of the digital services segment, contributing 42% of earnings. 
+                                <span class="inline-flex items-center gap-1 bg-surface-container-highest px-2 py-0.5 rounded-full text-[10px] font-label-mono text-primary cursor-pointer hover:bg-primary-fixed transition-colors">
+                                    [report.pdf • Page 3]
+                                </span>
+</li>
+<li class="">
+                                Implementation of AI-assisted operational workflows across all logistics divisions.
+                                <span class="inline-flex items-center gap-1 bg-surface-container-highest px-2 py-0.5 rounded-full text-[10px] font-label-mono text-primary cursor-pointer hover:bg-primary-fixed transition-colors">
+                                    [report.pdf • Page 3]
+                                </span>
+</li>
+</ul>
+<div class="p-3 bg-surface-container-low border-l-2 border-primary rounded-r">
+<p class="text-[11px] italic text-on-surface-variant">
+                                "The net profit margin improved by 450 basis points reaching an all-time high of 18.2%."
+                            </p>
+</div>
+</div>
+</div>
+<!-- Thinking State -->
+<div class="flex items-center gap-3 opacity-60">
+<div class="w-6 h-6 bg-surface-container-highest rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-xs animate-spin">cyclone</span>
+</div>
+<span class="text-[11px] font-label-mono text-on-surface-variant italic">Synthesizing multi-source context...</span>
+</div>
+</div>
+<!-- Input Dock -->
+<div class="p-4 bg-surface-container-lowest border-t border-outline-variant">
+<div class="mb-2 flex items-center gap-2">
+<span class="text-[10px] font-label-caps text-on-surface-variant uppercase">Search in:</span>
+<button class="flex items-center gap-1 bg-surface-container px-2 py-0.5 rounded text-[11px] border border-outline-variant hover:border-primary transition-colors">
+                        All Docs
+                        <span class="material-symbols-outlined text-[14px]">expand_more</span>
+</button>
+</div>
+<div class="relative">
+<textarea class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 text-body-sm focus:ring-1 focus:ring-primary focus:outline-none min-h-[100px] resize-none" placeholder="Ask a question about your documents..."></textarea>
+<div class="absolute bottom-3 right-3 flex gap-2">
+<button class="p-1.5 text-on-surface-variant hover:text-error transition-all" title="Reset">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+<button class="bg-primary text-on-primary w-8 h-8 rounded flex items-center justify-center shadow-md hover:bg-primary-container transition-all active:scale-90">
+<span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</div>
+<div class="mt-2 flex justify-between items-center text-[10px] text-outline">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">keyboard_command_key</span> Enter to send</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">attach_file</span> Attach context</span>
+</div>
+<span class="font-label-mono">v2.4.0-stable</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Context Menu (Hidden by default) -->
+<div class="fixed hidden bg-white shadow-xl border border-outline-variant p-4 w-64 z-[100] rounded-lg" id="citation-tooltip">
+<h4 class="font-label-caps text-[10px] text-primary mb-2 uppercase">Source Excerpt</h4>
+<p class="text-[11px] leading-relaxed text-on-surface">...optimized workflows across logistics divisions resulted in a 4.5% uptick in raw efficiency metrics, directly correlating to the margin growth reported in Q4...</p>
+<div class="mt-3 pt-2 border-t border-outline-variant flex justify-between items-center">
+<span class="text-[9px] font-label-mono text-outline">REPORT.PDF • SEC 3.2</span>
+<button class="text-primary text-[10px] font-bold hover:underline">Go to page</button>
+</div>
+</div>
+<script>
+        // Simple micro-interaction for citation hover
+        document.querySelectorAll('.citation-pill').forEach(pill => {
+            pill.addEventListener('mouseenter', (e) => {
+                const tooltip = document.getElementById('citation-tooltip');
+                tooltip.style.left = `${e.pageX + 10}px`;
+                tooltip.style.top = `${e.pageY + 10}px`;
+                tooltip.classList.remove('hidden');
+            });
+            pill.addEventListener('mouseleave', () => {
+                document.getElementById('citation-tooltip').classList.add('hidden');
+            });
+        });
+
+        // Toggle Highlight functionality simulation
+        let highlightActive = true;
+        const toggleBtn = document.querySelector('.group .w-8.h-4.bg-primary');
+        toggleBtn.parentElement.addEventListener('click', () => {
+            highlightActive = !highlightActive;
+            const dot = toggleBtn.querySelector('div');
+            if(highlightActive) {
+                toggleBtn.classList.replace('bg-outline-variant', 'bg-primary');
+                dot.classList.replace('left-1', 'right-1');
+                document.querySelectorAll('.bg-primary\\/10').forEach(el => el.style.opacity = '1');
+            } else {
+                toggleBtn.classList.replace('bg-primary', 'bg-outline-variant');
+                dot.classList.replace('right-1', 'left-1');
+                document.querySelectorAll('.bg-primary\\/10').forEach(el => el.style.opacity = '0');
+            }
+        });
+    </script>
+
+
+</body></html>

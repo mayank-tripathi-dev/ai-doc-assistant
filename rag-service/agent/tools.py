@@ -9,9 +9,14 @@ from database.qdrant import delete_document
 import os
 from tavily import TavilyClient
 
+tavily_key = os.getenv("TAVILY_API_KEY")
+if not tavily_key:
+    tavily_key = "tvly_dummy_key_for_local_testing"
+
 tavily = TavilyClient(
-    api_key=os.getenv("TAVILY_API_KEY")
+    api_key=tavily_key
 )
+
 
 
 

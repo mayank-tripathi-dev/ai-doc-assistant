@@ -94,24 +94,31 @@ def search_similar_chunks(
 def get_documents():
     response = client.scroll(
         collection_name=COLLECTION_NAME,
-        limit=1000,
+        limit=10000,
         with_payload=True,
         with_vectors=False,
     )
 
     points = response[0]
 
-    filenames = sorted(
-        list(
-            {
-                point.payload["filename"]
-                for point in points
-                if "filename" in point.payload
-            }
-        )
-    )
+    stats = {}
+    for point in points:
+        payload = point.payload
+        if "filename" in payload:
+            fn = payload["filename"]
+            page = payload.get("page", 1)
+            if fn not in stats:
+                stats[fn] = {
+                    "filename": fn,
+                    "pages": 0,
+                    "chunks": 0
+                }
+            stats[fn]["chunks"] += 1
+            if page > stats[fn]["pages"]:
+                stats[fn]["pages"] = page
 
-    return filenames
+    return sorted(list(stats.values()), key=lambda x: x["filename"])
+
 
 def delete_document(filename: str):
 
