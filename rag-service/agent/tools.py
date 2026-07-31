@@ -1,8 +1,10 @@
 from langchain.tools import tool
+from typing import Optional
 
 from services.embedding_service import generate_embeddings
 from database.qdrant import search_similar_chunks
 from database.qdrant import get_documents
+from difflib import get_close_matches
 from database.qdrant import delete_document
 import os
 from tavily import TavilyClient
@@ -12,24 +14,31 @@ tavily = TavilyClient(
 )
 
 
+
 @tool
-def retrieve_documents(query: str) -> str:
+def retrieve_documents(
+    query: str,
+    filename: Optional[str] = None,
+):
     """
-    Search the uploaded PDF documents using semantic vector search.
+    Search uploaded documents.
 
-    Use this tool whenever a user asks a question about uploaded
-    documents.
+    Args:
+        query:
+            The user's search question.
 
-    Input:
-        Natural language question.
+        filename:
+            Optional.
+            If provided, search only inside that document.
+            If omitted, search across all uploaded documents.
 
-    Returns:
-        Relevant document chunks.
+    Use this tool whenever you need information
+    from uploaded PDFs.
     """
 
     embedding = generate_embeddings([query])[0]
 
-    results = search_similar_chunks(embedding)
+    results = search_similar_chunks(embedding, filename=filename)
 
     if not results:
         return "No relevant documents found."
@@ -128,3 +137,28 @@ def web_search(query: str) -> str:
         )
 
     return context
+
+
+@tool
+def find_document(name: str) -> str:
+    """
+    Find the uploaded document whose filename
+    best matches the user's description.
+    """
+
+    documents = get_documents()
+
+    if not documents:
+        return "No documents uploaded."
+
+    matches = get_close_matches(
+        name,
+        documents,
+        n=1,
+        cutoff=0.3,
+    )
+
+    if matches:
+        return matches[0]
+
+    return "No matching document found."

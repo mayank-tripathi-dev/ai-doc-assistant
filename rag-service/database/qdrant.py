@@ -1,4 +1,5 @@
 from qdrant_client import QdrantClient
+import uuid
 from qdrant_client.models import (
     Distance,
     VectorParams,
@@ -37,7 +38,7 @@ def store_embeddings(chunks, embeddings, filename, metadata):
 ):
         points.append(
             PointStruct(
-                id=i,
+                id=str(uuid.uuid4()),
                 vector=embedding.tolist(),
                  payload={
                     "text": chunk,

@@ -8,6 +8,7 @@ from agent.tools import (
     summarize_document,
     remove_document,
     web_search,
+    find_document,
 )
 
 agent = create_react_agent(
@@ -19,6 +20,7 @@ agent = create_react_agent(
         summarize_document,
         remove_document,
         web_search,
+        find_document,
     ],
      
 )
