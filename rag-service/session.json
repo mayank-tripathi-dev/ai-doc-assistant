@@ -1,0 +1,159 @@
+{
+  "info": {
+    "id": "ses_04d248cafffeeMbg41cXZabqng",
+    "slug": "gentle-moon",
+    "projectID": "fdc7ecab4a106eb60bce68b5152bf1689ca2c678",
+    "directory": "/mnt/c/projects/ai-doc-assistant/rag-service",
+    "path": "rag-service",
+    "title": "New session - 2026-07-30T11:49:14.192Z",
+    "agent": "build",
+    "model": {
+      "id": "openai/gpt-oss-120b",
+      "providerID": "groq"
+    },
+    "version": "1.18.9",
+    "summary": {
+      "additions": 0,
+      "deletions": 0,
+      "files": 0
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "reasoning": 0,
+      "cache": {
+        "read": 0,
+        "write": 0
+      }
+    },
+    "time": {
+      "created": 1785412154192,
+      "updated": 1785412154743
+    }
+  },
+  "messages": [
+    {
+      "info": {
+        "role": "user",
+        "time": {
+          "created": 1785412154265
+        },
+        "agent": "build",
+        "model": {
+          "providerID": "groq",
+          "modelID": "openai/gpt-oss-120b"
+        },
+        "summary": {
+          "diffs": []
+        },
+        "id": "msg_fb2db7399001tSow1yJrfkUW0S",
+        "sessionID": "ses_04d248cafffeeMbg41cXZabqng"
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "Read ./main.py and explain what it does.",
+          "id": "prt_fb2db73a0001YJWVdmWqNw5z7z",
+          "sessionID": "ses_04d248cafffeeMbg41cXZabqng",
+          "messageID": "msg_fb2db7399001tSow1yJrfkUW0S"
+        }
+      ]
+    },
+    {
+      "info": {
+        "parentID": "msg_fb2db7399001tSow1yJrfkUW0S",
+        "role": "assistant",
+        "mode": "build",
+        "agent": "build",
+        "path": {
+          "cwd": "/mnt/c/projects/ai-doc-assistant/rag-service",
+          "root": "/mnt/c/projects/ai-doc-assistant"
+        },
+        "cost": 0,
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "reasoning": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
+          }
+        },
+        "modelID": "openai/gpt-oss-120b",
+        "providerID": "groq",
+        "time": {
+          "created": 1785412154336,
+          "completed": 1785412169777
+        },
+        "id": "msg_fb2db73e00016hEb3yKVAyej3X",
+        "sessionID": "ses_04d248cafffeeMbg41cXZabqng"
+      },
+      "parts": []
+    },
+    {
+      "info": {
+        "role": "user",
+        "model": {
+          "providerID": "groq",
+          "modelID": "openai/gpt-oss-120b"
+        },
+        "agent": "build",
+        "time": {
+          "created": 1785412169784
+        },
+        "id": "msg_fb2dbb038001pSTIXWd1RVQpxM",
+        "sessionID": "ses_04d248cafffeeMbg41cXZabqng"
+      },
+      "parts": [
+        {
+          "type": "compaction",
+          "auto": true,
+          "overflow": true,
+          "id": "prt_fb2dbb03c0011RRwQJb1VL0PRv",
+          "sessionID": "ses_04d248cafffeeMbg41cXZabqng",
+          "messageID": "msg_fb2dbb038001pSTIXWd1RVQpxM"
+        }
+      ]
+    },
+    {
+      "info": {
+        "role": "assistant",
+        "parentID": "msg_fb2dbb038001pSTIXWd1RVQpxM",
+        "mode": "compaction",
+        "agent": "compaction",
+        "summary": true,
+        "path": {
+          "cwd": "/mnt/c/projects/ai-doc-assistant/rag-service",
+          "root": "/mnt/c/projects/ai-doc-assistant"
+        },
+        "cost": 0,
+        "tokens": {
+          "output": 0,
+          "input": 0,
+          "reasoning": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
+          }
+        },
+        "modelID": "openai/gpt-oss-120b",
+        "providerID": "groq",
+        "time": {
+          "created": 1785412169802,
+          "completed": 1785412170292
+        },
+        "error": {
+          "name": "ContextOverflowError",
+          "data": {
+            "message": "Session too large to compact - context exceeds model limit even after stripping media"
+          }
+        },
+        "finish": "error",
+        "id": "msg_fb2dbb04a001cIQqpKNzh3rXVZ",
+        "sessionID": "ses_04d248cafffeeMbg41cXZabqng"
+      },
+      "parts": []
+    }
+  ]
+}

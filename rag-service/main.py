@@ -1,4 +1,6 @@
 from services.llm_service import generate_answer
+from agent.graph import agent
+from agent.react_agent import agent
 from fastapi import FastAPI, UploadFile, File
 from services.pdf_service import extract_text
 from utils.chunker import chunk_text
@@ -101,25 +103,22 @@ async def upload_pdf(file: UploadFile = File(...)):
 @app.post("/search")
 async def search(request: SearchRequest):
 
-    # Generate embedding for the user's question
-    query_embedding = generate_embeddings([request.query])[0]
+    response = agent.invoke(
+        {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": request.query,
+                }
+            ]
+        }
+    )
 
-    # Retrieve relevant chunks
-    results = search_similar_chunks(
-    query_embedding,
-    filename=request.filename
-)
-
-    # Combine retrieved chunks into one context
-    context = "\n\n".join([item["text"] for item in results])
-
-    # Ask the LLM
-    answer = generate_answer(request.query, context)
+    answer = response["messages"][-1].content
 
     return {
         "query": request.query,
         "answer": answer,
-        "sources": results
     }
 
 @app.get("/documents")
