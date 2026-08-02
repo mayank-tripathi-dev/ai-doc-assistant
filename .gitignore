@@ -35,4 +35,10 @@ __pycache__/
 *.pyc
 
 # Uploads
-rag-service/uploads/
+rag-service/uploads/# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
