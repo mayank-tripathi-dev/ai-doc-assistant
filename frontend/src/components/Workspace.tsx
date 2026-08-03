@@ -34,13 +34,18 @@ interface WorkspaceProps {
   selectedDoc: Document | null;
   documents: Document[];
   onSendMessage: (query: string) => Promise<string>;
+  setSelectedDoc?: (doc: Document | null) => void;
+  onUpload?: (file: File) => Promise<void>;
 }
 
 export default function Workspace({
   selectedDoc,
   documents,
   onSendMessage,
+  setSelectedDoc,
+  onUpload,
 }: WorkspaceProps) {
+  const chatFileInputRef = useRef<HTMLInputElement>(null);
   // Document Viewer states
   const [docDetail, setDocDetail] = useState<DocumentDetail | null>(null);
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
@@ -191,15 +196,32 @@ export default function Workspace({
     }
   };
 
+  // Active chunk highlight on citation click
+  const [highlightedChunkText, setHighlightedChunkText] = useState<string | null>(null);
+
   // Navigates to a specific page parsed from a citation click
   const handleCitationClick = (text: string) => {
-    // Look for patterns like "Page X" or "page X"
+    // Look for patterns like "filename.pdf • Page X" or "Page X"
+    const docMatch = text.match(/([a-zA-Z0-9_\-\s\(\)]+\.pdf)\s*•?\s*Page\s*(\d+)/i);
     const pageMatch = text.match(/Page\s+(\d+)/i) || text.match(/page\s+(\d+)/i);
-    if (pageMatch && docDetail) {
-      const pageNum = parseInt(pageMatch[1], 10);
-      const pageIdx = docDetail.pages.findIndex(p => p.page === pageNum);
+
+    let targetDocName = docMatch ? docMatch[1].trim() : null;
+    let targetPage = docMatch ? parseInt(docMatch[2], 10) : (pageMatch ? parseInt(pageMatch[1], 10) : null);
+
+    if (targetDocName && setSelectedDoc && selectedDoc?.filename !== targetDocName) {
+      const found = documents.find((d) => d.filename.toLowerCase() === targetDocName.toLowerCase());
+      if (found) {
+        setSelectedDoc(found);
+      }
+    }
+
+    if (targetPage !== null && docDetail) {
+      const pageIdx = docDetail.pages.findIndex(p => p.page === targetPage);
       if (pageIdx !== -1) {
         setCurrentPageIndex(pageIdx);
+        // Highlight first chunk on the page or matching excerpt
+        setHighlightedChunkText(text);
+        setTimeout(() => setHighlightedChunkText(null), 4000);
       }
     }
   };
@@ -241,25 +263,25 @@ export default function Workspace({
   return (
     <div className="flex-1 flex mt-12 h-[calc(100vh-48px)] overflow-hidden bg-background text-on-surface transition-colors">
       {/* Left Pane: PDF Document Viewer */}
-      <section className="flex-1 border-r border-outline-variant flex flex-col relative overflow-hidden bg-slate-900">
+      <section className="flex-1 border-r border-outline-variant flex flex-col relative overflow-hidden bg-surface-low">
         {/* PDF Toolbar */}
-        <div className="glass-toolbar h-12 border-b border-outline-variant flex items-center justify-between px-6 sticky top-0 z-30">
+        <div className="h-12 border-b border-outline-variant bg-surface-container flex items-center justify-between px-6 sticky top-0 z-30 transition-colors">
           <div className="flex items-center gap-4">
-            <span className="font-label-mono text-label-mono text-slate-300 uppercase truncate max-w-[250px]">
+            <span className="font-label-mono text-label-mono text-on-surface uppercase truncate max-w-[250px]">
               {selectedDoc ? selectedDoc.filename : "No Document Selected"}
             </span>
             {docDetail && (
               <>
-                <div className="h-4 w-px bg-slate-700"></div>
-                <div className="flex items-center gap-2 bg-slate-800 px-2 py-1 rounded border border-slate-700">
+                <div className="h-4 w-px bg-outline-variant"></div>
+                <div className="flex items-center gap-2 bg-surface-container-high px-2 py-1 rounded border border-outline-variant">
                   <button
                     onClick={() => setCurrentPageIndex((prev) => Math.max(0, prev - 1))}
                     disabled={currentPageIndex === 0}
-                    className="material-symbols-outlined text-sm text-slate-300 hover:text-primary cursor-pointer disabled:opacity-30"
+                    className="material-symbols-outlined text-sm text-on-surface hover:text-primary cursor-pointer disabled:opacity-30"
                   >
                     chevron_left
                   </button>
-                  <span className="font-label-mono text-[12px] min-w-[70px] text-center text-slate-300">
+                  <span className="font-label-mono text-[12px] min-w-[70px] text-center text-on-surface">
                     Page {currentPageIndex + 1} / {docDetail.pages.length}
                   </span>
                   <button
@@ -269,7 +291,7 @@ export default function Workspace({
                       )
                     }
                     disabled={currentPageIndex === docDetail.pages.length - 1}
-                    className="material-symbols-outlined text-sm text-slate-300 hover:text-primary cursor-pointer disabled:opacity-30"
+                    className="material-symbols-outlined text-sm text-on-surface hover:text-primary cursor-pointer disabled:opacity-30"
                   >
                     chevron_right
                   </button>
@@ -283,29 +305,29 @@ export default function Workspace({
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setZoom((prev) => Math.max(50, prev - 25))}
-                  className="material-symbols-outlined text-lg text-slate-300 hover:text-primary cursor-pointer"
+                  className="material-symbols-outlined text-lg text-on-surface hover:text-primary cursor-pointer"
                 >
                   zoom_out
                 </button>
-                <span className="font-label-mono text-[12px] text-slate-300">{zoom}%</span>
+                <span className="font-label-mono text-[12px] text-on-surface">{zoom}%</span>
                 <button
                   onClick={() => setZoom((prev) => Math.min(200, prev + 25))}
-                  className="material-symbols-outlined text-lg text-slate-300 hover:text-primary cursor-pointer"
+                  className="material-symbols-outlined text-lg text-on-surface hover:text-primary cursor-pointer"
                 >
                   zoom_in
                 </button>
               </div>
 
-              <div className="h-4 w-px bg-slate-700"></div>
+              <div className="h-4 w-px bg-outline-variant"></div>
 
               <label className="flex items-center gap-2 cursor-pointer group">
-                <span className="font-label-caps text-label-caps text-slate-300 group-hover:text-primary uppercase">
+                <span className="font-label-caps text-label-caps text-on-surface-variant group-hover:text-primary uppercase">
                   Highlight Chunks
                 </span>
                 <div
                   onClick={() => setHighlightChunks(!highlightChunks)}
                   className={`w-8 h-4 rounded-full relative transition-all ${
-                    highlightChunks ? "bg-primary" : "bg-slate-700"
+                    highlightChunks ? "bg-primary" : "bg-surface-container-highest"
                   }`}
                 >
                   <div
@@ -320,9 +342,9 @@ export default function Workspace({
         </div>
 
         {/* PDF Page Canvas */}
-        <div className="flex-1 overflow-y-auto p-8 flex justify-center scroll-smooth bg-slate-950">
+        <div className="flex-1 overflow-y-auto p-8 flex justify-center scroll-smooth bg-surface-lowest transition-colors">
           {isLoadingDoc ? (
-            <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
+            <div className="flex flex-col items-center justify-center gap-2 text-on-surface-variant">
               <span className="material-symbols-outlined animate-spin text-primary text-3xl">
                 cyclone
               </span>
@@ -331,49 +353,56 @@ export default function Workspace({
           ) : activePage ? (
             <div
               style={{ width: `${(800 * zoom) / 100}px` }}
-              className="bg-slate-900 border border-slate-800 shadow-2xl relative min-h-[900px] p-12 text-slate-300 transition-all select-text"
+              className="bg-surface-container border border-outline-variant/60 shadow-xl relative min-h-[900px] p-12 text-on-surface transition-all select-text rounded-lg"
             >
-              <div className="absolute top-6 right-8 font-label-mono text-[10px] text-slate-500">
+              <div className="absolute top-6 right-8 font-label-mono text-[10px] text-on-surface-variant/70">
                 PAGE {activePage.page} • INDEXED
               </div>
 
               <div className="space-y-6 mt-4">
-                <h2 className="font-h2 text-xl text-white font-bold border-b border-slate-700 pb-2">
+                <h2 className="font-h2 text-xl text-on-surface font-bold border-b border-outline-variant/40 pb-2">
                   Document Content
                 </h2>
 
                 {highlightChunks ? (
                   <div className="space-y-4">
-                    {activePage.chunks.map((chunk, idx) => (
-                      <div
-                        key={idx}
-                        className="relative group border-l-2 border-primary/40 pl-3 py-1 hover:bg-slate-800/40 rounded transition-all"
-                      >
-                        <div className="absolute -inset-1 bg-primary/5 rounded-sm pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <p className="text-body-base leading-relaxed text-slate-300">
-                          {chunk.text}
-                        </p>
-                        <div className="absolute right-2 top-0.5 translate-x-1 border border-primary/30 bg-primary/10 text-primary text-[8px] px-1.5 py-0.5 rounded font-label-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-sm">
-                          CHUNK_ID: {chunk.id}
+                    {activePage.chunks.map((chunk, idx) => {
+                      const isHighlighted = highlightedChunkText && (idx === 0 || chunk.text.includes(highlightedChunkText));
+                      return (
+                        <div
+                          key={idx}
+                          className={`relative group border-l-2 pl-3 py-1.5 rounded transition-all ${
+                            isHighlighted
+                              ? "border-amber-500 bg-amber-500/15 ring-2 ring-amber-400/80 shadow-lg shadow-amber-500/10 animate-pulse"
+                              : "border-primary/40 hover:bg-surface-container-high/50"
+                          }`}
+                        >
+                          <div className="absolute -inset-1 bg-primary/5 rounded-sm pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                          <p className={`text-body-base leading-relaxed ${isHighlighted ? "text-amber-800 dark:text-amber-200 font-semibold" : "text-on-surface"}`}>
+                            {chunk.text}
+                          </p>
+                          <div className="absolute right-2 top-0.5 translate-x-1 border border-primary/30 bg-primary/10 text-primary text-[8px] px-1.5 py-0.5 rounded font-label-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-sm">
+                            CHUNK_ID: {chunk.id}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
-                  <p className="text-body-base leading-relaxed text-slate-300 whitespace-pre-line">
+                  <p className="text-body-base leading-relaxed text-on-surface whitespace-pre-line">
                     {activePage.text}
                   </p>
                 )}
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center text-center max-w-md gap-4 text-slate-500">
+            <div className="flex flex-col items-center justify-center text-center max-w-md gap-4 text-on-surface-variant/60">
               <span className="material-symbols-outlined text-5xl text-primary/40">
                 description
               </span>
               <div>
-                <h3 className="font-h2 text-white font-semibold mb-1">No Active Document</h3>
-                <p className="text-body-sm text-slate-400">
+                <h3 className="font-h2 text-on-surface font-semibold mb-1">No Active Document</h3>
+                <p className="text-body-sm text-on-surface-variant">
                   Select an indexed document from the left sidebar list or upload a PDF to inspect
                   its content pages.
                 </p>
@@ -474,14 +503,63 @@ export default function Workspace({
 
         {/* Input Dock */}
         <div className="p-4 border-t border-outline-variant/60 bg-surface-low/30">
+          {/* Suggested Quick Question Chips */}
+          <div className="mb-3 flex flex-wrap gap-1.5">
+            <button
+              onClick={() => {
+                const text = selectedDoc ? `Summarize ${selectedDoc.filename}` : "Summarize the uploaded document";
+                setInputValue(text);
+              }}
+              className="text-[10px] bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 px-2.5 py-1 rounded-full font-medium transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[12px]">auto_awesome</span>
+              Summarize
+            </button>
+            <button
+              onClick={() => {
+                setInputValue("Extract the key takeaways and technical skills");
+              }}
+              className="text-[10px] bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/20 px-2.5 py-1 rounded-full font-medium transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[12px]">key</span>
+              Key Takeaways
+            </button>
+            <button
+              onClick={() => {
+                setInputValue("Search web for recent industry updates on this topic");
+              }}
+              className="text-[10px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 px-2.5 py-1 rounded-full font-medium transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[12px]">language</span>
+              Web Search
+            </button>
+          </div>
+
           <div className="mb-2 flex items-center gap-2">
             <span className="text-[9px] font-label-caps text-on-surface-variant uppercase">
               Target Scope:
             </span>
-            <button className="flex items-center gap-1 bg-surface-container border border-outline-variant px-2 py-0.5 rounded text-[10px] text-on-surface hover:border-primary transition-all">
-              {selectedDoc ? selectedDoc.filename : "All Documents"}
-              <span className="material-symbols-outlined text-[12px]">expand_more</span>
-            </button>
+            <select
+              value={selectedDoc?.filename || "ALL"}
+              onChange={(e) => {
+                if (!setSelectedDoc) return;
+                const val = e.target.value;
+                if (val === "ALL") {
+                  setSelectedDoc(null);
+                } else {
+                  const found = documents.find((d) => d.filename === val);
+                  if (found) setSelectedDoc(found);
+                }
+              }}
+              className="bg-surface-container border border-outline-variant px-2 py-0.5 rounded text-[10px] text-on-surface hover:border-primary transition-all cursor-pointer font-label-mono focus:outline-none"
+            >
+              <option value="ALL">All Documents</option>
+              {documents.map((d, i) => (
+                <option key={i} value={d.filename}>
+                  {d.filename}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="relative">
@@ -497,10 +575,31 @@ export default function Workspace({
                   : "Ask a question about your indexed documents..."
               }
             />
-            <div className="absolute bottom-3 right-3 flex gap-2">
+            <div className="absolute bottom-3 right-3 flex gap-1.5">
+              <button
+                onClick={() => {
+                  let report = `# AI Document Assistant - Analysis Report\n`;
+                  report += `Generated: ${new Date().toLocaleString()}\n`;
+                  report += `Target Document: ${selectedDoc ? selectedDoc.filename : "All Documents"}\n\n---\n\n`;
+                  chatHistory.forEach((msg) => {
+                    report += `### ${msg.role === "user" ? "User" : "AI Assistant"} (${msg.timestamp})\n${msg.text}\n\n`;
+                  });
+                  const blob = new Blob([report], { type: "text/markdown" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `doc_analysis_report_${Date.now()}.md`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="p-1.5 text-on-surface-variant hover:text-primary transition-all cursor-pointer"
+                title="Export Analysis Report (.md)"
+              >
+                <span className="material-symbols-outlined text-lg">download</span>
+              </button>
               <button
                 onClick={() => setChatHistory([chatHistory[0]])}
-                className="p-1.5 text-on-surface-variant hover:text-error transition-all"
+                className="p-1.5 text-on-surface-variant hover:text-error transition-all cursor-pointer"
                 title="Reset conversation"
               >
                 <span className="material-symbols-outlined text-lg">refresh</span>
@@ -508,21 +607,36 @@ export default function Workspace({
               <button
                 onClick={handleSend}
                 disabled={isSearching || !inputValue.trim()}
-                className="bg-primary text-on-primary w-8 h-8 rounded flex items-center justify-center shadow-md hover:bg-opacity-95 transition-all active:scale-90 disabled:opacity-40"
+                className="bg-primary text-on-primary w-8 h-8 rounded flex items-center justify-center shadow-md hover:bg-opacity-95 transition-all active:scale-90 disabled:opacity-40 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base">send</span>
               </button>
             </div>
           </div>
           <div className="mt-2 flex justify-between items-center text-[10px] text-on-surface-variant/60">
+            <input
+              type="file"
+              ref={chatFileInputRef}
+              accept="application/pdf"
+              className="hidden"
+              onChange={async (e) => {
+                if (e.target.files && e.target.files.length > 0 && onUpload) {
+                  await onUpload(e.target.files[0]);
+                }
+              }}
+            />
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1">
                 <span className="material-symbols-outlined text-[11px]">keyboard_command_key</span>{" "}
-                Enter
+                Enter to send
               </span>
-              <span className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-[11px]">attach_file</span> Context
-              </span>
+              <button
+                onClick={() => chatFileInputRef.current?.click()}
+                className="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+                title="Attach PDF context document"
+              >
+                <span className="material-symbols-outlined text-[12px]">attach_file</span> Attach Context PDF
+              </button>
             </div>
             <span className="font-label-mono">v2.4.0-stable</span>
           </div>

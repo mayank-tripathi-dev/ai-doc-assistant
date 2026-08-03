@@ -2,44 +2,60 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const prisma = require('./database');
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback',
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        const email = profile.emails[0].value;
-        const name = profile.displayName;
-        const profilePic = profile.photos?.[0]?.value || null;
-        const googleId = profile.id;
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback',
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          const email = profile.emails[0].value;
+          const name = profile.displayName;
+          const profilePic = profile.photos?.[0]?.value || null;
+          const googleId = profile.id;
 
-        // Upsert user — create if not exists, update if exists
-        const user = await prisma.user.upsert({
-          where: { googleId },
-          update: {
-            name,
-            profilePic,
-            email,
-          },
-          create: {
-            email,
-            name,
-            profilePic,
-            googleId,
-            provider: 'GOOGLE',
-          },
-        });
+          const existingUser = await prisma.user.findFirst({
+            where: {
+              OR: [{ googleId }, { email }],
+            },
+          });
 
-        return done(null, user);
-      } catch (error) {
-        return done(error, null);
+          let user;
+          if (existingUser) {
+            user = await prisma.user.update({
+              where: { id: existingUser.id },
+              data: {
+                name: name || existingUser.name,
+                profilePic: profilePic || existingUser.profilePic,
+                googleId,
+                provider: 'GOOGLE',
+              },
+            });
+          } else {
+            user = await prisma.user.create({
+              data: {
+                email,
+                name,
+                profilePic,
+                googleId,
+                provider: 'GOOGLE',
+              },
+            });
+          }
+
+          return done(null, user);
+        } catch (error) {
+          return done(error, null);
+        }
       }
-    }
-  )
-);
+    )
+  );
+} else {
+  console.warn('Google OAuth not configured (set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)');
+}
 
 passport.serializeUser((user, done) => {
   done(null, user.id);

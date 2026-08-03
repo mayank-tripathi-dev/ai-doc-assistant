@@ -25,6 +25,8 @@ export default function DocumentHub({
 }: DocumentHubProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
 
   // Stats calculation
   const totalDocs = documents.length;
@@ -175,9 +177,20 @@ export default function DocumentHub({
         {/* Document List Table */}
         <div className="bg-surface-container border border-outline-variant/50 rounded-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-outline-variant/30 flex items-center justify-between">
-            <h3 className="font-h2 text-base font-bold text-on-surface">
-              Indexed Document Repository
-            </h3>
+            <div className="flex items-center gap-3">
+              <h3 className="font-h2 text-base font-bold text-on-surface">
+                Indexed Document Repository
+              </h3>
+              {selectedForCompare.length === 2 && (
+                <button
+                  onClick={() => setShowCompareModal(true)}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow transition-all flex items-center gap-1 cursor-pointer animate-pulse"
+                >
+                  <span className="material-symbols-outlined text-sm">compare_arrows</span>
+                  Compare 2 Selected Docs
+                </button>
+              )}
+            </div>
             <span className="font-label-mono text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded">
               Qdrant Connected
             </span>
@@ -187,6 +200,7 @@ export default function DocumentHub({
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-outline-variant/30 text-on-surface-variant uppercase font-label-caps text-[10px] bg-background/50">
+                  <th className="px-4 py-3 w-10 text-center">Select</th>
                   <th className="px-6 py-3 font-bold">Document Name</th>
                   <th className="px-6 py-3 font-bold">Pages</th>
                   <th className="px-6 py-3 font-bold">Chunks</th>
@@ -194,45 +208,68 @@ export default function DocumentHub({
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/20 font-body-base text-on-surface/90">
-                {documents.map((doc, idx) => (
-                  <tr
-                    key={idx}
-                    className="hover:bg-background/30 transition-colors cursor-pointer"
-                    onClick={() => onSelectDoc(doc)}
-                  >
-                    <td className="px-6 py-4 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-lg">
-                        description
-                      </span>
-                      <span className="font-medium truncate max-w-[300px]">
-                        {doc.filename}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 font-label-mono">{doc.pages || 0} pages</td>
-                    <td className="px-6 py-4 font-label-mono">{doc.chunks || 0} chunks</td>
-                    <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => onSelectDoc(doc)}
-                          className="text-primary hover:text-opacity-80 font-label-caps text-[10px] font-bold uppercase px-3 py-1 bg-primary/10 rounded transition-all"
-                        >
-                          Workspace
-                        </button>
-                        <button
-                          onClick={() => onDelete(doc.filename)}
-                          className="text-error hover:text-opacity-80 font-label-caps text-[10px] font-bold uppercase px-3 py-1 bg-error/10 rounded transition-all"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {documents.map((doc, idx) => {
+                  const isChecked = selectedForCompare.includes(doc.filename);
+                  return (
+                    <tr
+                      key={idx}
+                      className={`hover:bg-background/30 transition-colors cursor-pointer ${
+                        isChecked ? "bg-indigo-900/10" : ""
+                      }`}
+                      onClick={() => onSelectDoc(doc)}
+                    >
+                      <td className="px-4 py-4 text-center" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {
+                            if (isChecked) {
+                              setSelectedForCompare((prev) => prev.filter((f) => f !== doc.filename));
+                            } else {
+                              if (selectedForCompare.length >= 2) {
+                                setSelectedForCompare([selectedForCompare[1], doc.filename]);
+                              } else {
+                                setSelectedForCompare((prev) => [...prev, doc.filename]);
+                              }
+                            }
+                          }}
+                          className="w-4 h-4 rounded text-indigo-600 cursor-pointer accent-indigo-500"
+                        />
+                      </td>
+                      <td className="px-6 py-4 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary text-lg">
+                          description
+                        </span>
+                        <span className="font-medium truncate max-w-[300px]">
+                          {doc.filename}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 font-label-mono">{doc.pages || 0} pages</td>
+                      <td className="px-6 py-4 font-label-mono">{doc.chunks || 0} chunks</td>
+                      <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => onSelectDoc(doc)}
+                            className="text-primary hover:text-opacity-80 font-label-caps text-[10px] font-bold uppercase px-3 py-1 bg-primary/10 rounded transition-all"
+                          >
+                            Workspace
+                          </button>
+                          <button
+                            onClick={() => onDelete(doc.filename)}
+                            className="text-error hover:text-opacity-80 font-label-caps text-[10px] font-bold uppercase px-3 py-1 bg-error/10 rounded transition-all"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
 
                 {documents.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center text-on-surface-variant/60">
-                      No documents index. Upload a PDF above to begin.
+                    <td colSpan={5} className="px-6 py-12 text-center text-on-surface-variant/60">
+                      No documents indexed. Upload a PDF above to begin.
                     </td>
                   </tr>
                 )}
@@ -241,6 +278,79 @@ export default function DocumentHub({
           </div>
         </div>
       </div>
+
+      {/* Side-by-Side Comparison Modal */}
+      {showCompareModal && selectedForCompare.length === 2 && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-[100] p-6">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full p-6 text-slate-200 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-indigo-400 text-2xl">compare_arrows</span>
+                <h3 className="font-h2 text-lg font-bold text-white">Side-by-Side Document Comparison</h3>
+              </div>
+              <button
+                onClick={() => setShowCompareModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 my-6">
+              {selectedForCompare.map((filename, i) => {
+                const doc = documents.find((d) => d.filename === filename);
+                return (
+                  <div key={i} className="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4">
+                    <div className="flex items-center gap-2 text-indigo-400 font-bold border-b border-slate-800 pb-2">
+                      <span className="material-symbols-outlined">description</span>
+                      <span className="truncate text-sm">{filename}</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                      <div className="bg-slate-900 p-2.5 rounded border border-slate-800">
+                        <span className="text-slate-500 uppercase text-[9px] block">Pages</span>
+                        <span className="text-white font-bold">{doc?.pages || 0}</span>
+                      </div>
+                      <div className="bg-slate-900 p-2.5 rounded border border-slate-800">
+                        <span className="text-slate-500 uppercase text-[9px] block">Vector Chunks</span>
+                        <span className="text-white font-bold">{doc?.chunks || 0}</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded border border-slate-800/80 text-xs text-slate-300 space-y-2">
+                      <p className="font-bold text-slate-200">Semantic Overview</p>
+                      <p className="text-[11px] leading-relaxed text-slate-400">
+                        Parsed and indexed into Qdrant collection. Ready for cross-document query comparison.
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        if (doc) {
+                          onSelectDoc(doc);
+                          setShowCompareModal(false);
+                        }
+                      }}
+                      className="w-full bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-600/30 text-xs font-bold py-2 rounded-lg transition-all"
+                    >
+                      Open in Workspace
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="pt-4 border-t border-slate-800 flex justify-end">
+              <button
+                onClick={() => setShowCompareModal(false)}
+                className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all"
+              >
+                Close Comparison
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

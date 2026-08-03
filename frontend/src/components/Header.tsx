@@ -23,20 +23,22 @@ export default function Header({
   onLogout,
 }: HeaderProps) {
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu on click outside
+  // Close menus on click outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setShowUserMenu(false);
+        setShowNotifications(false);
       }
     }
-    if (showUserMenu) {
+    if (showUserMenu || showNotifications) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [showUserMenu]);
+  }, [showUserMenu, showNotifications]);
 
   const getInitials = () => {
     if (user?.name) return user.name.charAt(0).toUpperCase();
@@ -108,9 +110,68 @@ export default function Header({
 
         {/* User profile */}
         <div className="flex items-center gap-2 border-l border-outline-variant pl-4" ref={menuRef}>
-          <button className="text-on-surface-variant hover:text-primary transition-all p-1">
-            <span className="material-symbols-outlined">notifications</span>
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="text-on-surface-variant hover:text-primary transition-all p-1 relative cursor-pointer"
+              title="Notifications"
+            >
+              <span className="material-symbols-outlined">notifications</span>
+              <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            </button>
+
+            {/* Notifications Dropdown */}
+            {showNotifications && (
+              <div
+                className="absolute right-0 top-10 w-80 rounded-xl shadow-2xl overflow-hidden z-50 p-4 text-xs text-slate-200"
+                style={{
+                  background: "rgba(22,27,34,0.95)",
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(48,54,61,0.8)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                }}
+              >
+                <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+                  <h4 className="font-bold text-white text-sm">System Notifications</h4>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full font-mono">
+                      All Systems Operational
+                    </span>
+                    <button
+                      onClick={() => setShowNotifications(false)}
+                      className="text-slate-400 hover:text-white p-0.5 rounded hover:bg-slate-800 transition-colors"
+                      title="Close"
+                    >
+                      <span className="material-symbols-outlined text-sm">close</span>
+                    </button>
+                  </div>
+                </div>
+                <div className="py-3 space-y-3">
+                  <div className="flex items-start gap-2.5">
+                    <span className="material-symbols-outlined text-green-400 text-base">database</span>
+                    <div>
+                      <p className="font-semibold text-slate-200">Qdrant Vector DB</p>
+                      <p className="text-[11px] text-slate-400">Local collection initialized & ready for document embeddings.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="material-symbols-outlined text-blue-400 text-base">psychology</span>
+                    <div>
+                      <p className="font-semibold text-slate-200">Groq LLM Engine</p>
+                      <p className="text-[11px] text-slate-400">llama-3.1-8b-instant active (500k TPD high speed limit).</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <span className="material-symbols-outlined text-emerald-400 text-base">language</span>
+                    <div>
+                      <p className="font-semibold text-slate-200">Tavily Web Search</p>
+                      <p className="text-[11px] text-slate-400">API Key configured for live internet search queries.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}

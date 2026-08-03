@@ -30,6 +30,7 @@ export default function Sidebar({
   onLogout,
 }: SidebarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -151,21 +152,73 @@ export default function Sidebar({
       </div>
 
       <div className="mt-auto pt-4 border-t border-outline-variant/30 space-y-1">
-        <a
-          className="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-3 py-2 transition-colors duration-200 text-body-sm font-semibold"
-          href="#"
+        <button
+          onClick={() => setShowHelpModal(true)}
+          className="text-on-surface-variant hover:text-on-surface flex items-center gap-3 px-3 py-2 transition-colors duration-200 text-body-sm font-semibold w-full text-left cursor-pointer"
         >
           <span className="material-symbols-outlined text-lg">help</span>
-          <span className="font-label-caps uppercase">Help</span>
-        </a>
+          <span className="font-label-caps uppercase">Help & Guide</span>
+        </button>
         <button
           onClick={onLogout}
-          className="text-on-surface-variant hover:text-red-400 flex items-center gap-3 px-3 py-2 transition-colors duration-200 text-body-sm font-semibold w-full"
+          className="text-on-surface-variant hover:text-red-400 flex items-center gap-3 px-3 py-2 transition-colors duration-200 text-body-sm font-semibold w-full text-left cursor-pointer"
         >
           <span className="material-symbols-outlined text-lg">logout</span>
           <span className="font-label-caps uppercase">Logout</span>
         </button>
       </div>
+
+      {/* Help Modal */}
+      {showHelpModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 text-slate-200 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-2xl">help</span>
+                <h3 className="font-h2 text-lg font-bold text-white">AI Doc Assistant Guide</h3>
+              </div>
+              <button
+                onClick={() => setShowHelpModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            
+            <div className="py-4 space-y-4 text-sm text-slate-300">
+              <div>
+                <h4 className="font-bold text-primary mb-1">📄 1. Upload & Index Documents</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Click <b>Upload PDF</b> to upload any document. Your document is split into page-wise text chunks and embedded into Qdrant vector database.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-primary mb-1">💬 2. Ask Questions & Target Scope</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Use the <b>Target Scope</b> dropdown to ask questions about a specific PDF or search across all indexed files.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-primary mb-1">🌐 3. Web Search Integration</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Include keywords like <i>"web"</i>, <i>"latest"</i>, or <i>"news"</i> in your query to trigger live Tavily internet search.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-800 flex justify-end">
+              <button
+                onClick={() => setShowHelpModal(false)}
+                className="bg-primary text-on-primary font-bold px-4 py-2 rounded-lg text-xs hover:opacity-90 transition-all"
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

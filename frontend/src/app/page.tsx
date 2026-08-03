@@ -7,7 +7,7 @@ import Workspace from "@/components/Workspace";
 import DocumentHub from "@/components/DocumentHub";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { User } from "@/lib/auth";
+import LandingPage from "@/components/LandingPage";
 
 interface Document {
   filename: string;
@@ -18,12 +18,6 @@ interface Document {
 export default function Home() {
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.replace("/login");
-    }
-  }, [authLoading, isAuthenticated, router]);
 
   const [view, setView] = useState<"workspace" | "document_hub">("document_hub");
   const [darkMode, setDarkMode] = useState<boolean>(true);
@@ -175,12 +169,16 @@ export default function Home() {
     }
   };
 
-  if (authLoading || !isAuthenticated) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return <LandingPage />;
   }
 
   return (
@@ -226,6 +224,8 @@ export default function Home() {
             selectedDoc={selectedDoc}
             documents={documents}
             onSendMessage={handleSendMessage}
+            setSelectedDoc={setSelectedDoc}
+            onUpload={handleUpload}
           />
         )}
       </main>
