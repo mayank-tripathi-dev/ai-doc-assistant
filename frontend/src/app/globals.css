@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8f9ff;
+  --on-background: #0b1c30;
+  --surface: #f8f9ff;
+  --on-surface: #0b1c30;
+  --on-surface-variant: #464554;
+  --primary: #4648d4;
+  --on-primary: #ffffff;
+  --outline: #767586;
+  --outline-variant: #c7c4d7;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --surface-container: #e5eeff;
+  --surface-container-high: #dce9ff;
+  --surface-container-highest: #d3e4fe;
+  --surface-dim: #cbdbf5;
+  --surface-bright: #f8f9ff;
+  --sidebar-width: 280px;
+}
+
+.dark {
+  --background: #0F172A;
+  --on-background: #f8f9ff;
+  --surface: #0F172A;
+  --on-surface: #f8f9ff;
+  --on-surface-variant: #94a3b8;
+  --primary: #6366f1;
+  --on-primary: #ffffff;
+  --outline: #767586;
+  --outline-variant: #334155;
+  --surface-container-lowest: #0F172A;
+  --surface-container-low: #0F172A;
+  --surface-container: #1e293b;
+  --surface-container-high: #1e293b;
+  --surface-container-highest: #1e293b;
+  --surface-dim: #0F172A;
+  --surface-bright: #1e293b;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-on-background: var(--on-background);
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-surface-lowest: var(--surface-container-lowest);
+  --color-surface-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-high: var(--surface-container-high);
+  --color-surface-highest: var(--surface-container-highest);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+
+  --font-sans: var(--font-inter), sans-serif;
+  --font-mono: var(--font-mono), monospace;
+
+  --width-sidebar: var(--sidebar-width);
+}
+
+body {
+  background: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-sans);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
+.document-canvas-overlay {
+  mix-blend-mode: multiply;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+
+.glass-toolbar {
+  backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.85);
+}
+
+/* Typography styles matching DESIGN.md */
+.font-body-base {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+.text-body-sm {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+}
+.font-label-caps {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0.05em;
+}
+.font-label-mono {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+}
+.font-h1 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+  letter-spacing: -0.01em;
+}
+.font-h2 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+.font-display {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 36px;
+  letter-spacing: -0.02em;
+}
+
+/* Custom layout sizes */
+.w-sidebar {
+  width: var(--sidebar-width) !important;
+}
+.ml-sidebar, .ml-sidebar-width {
+  margin-left: var(--sidebar-width) !important;
+}
+
